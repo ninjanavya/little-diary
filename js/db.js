@@ -1,11 +1,22 @@
 /**
  * IndexedDB storage module for Digital Diary
  * Handles persistent storing, loading, deleting, and reordering of Canva pages.
+ * Includes default pre-loaded sequential Canva pages (1.png to 7.png).
  */
 
 const DB_NAME = 'OurLittleDiaryDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'pages';
+
+const INITIAL_DEFAULT_PAGES = [
+  'images/1.png',
+  'images/2.png',
+  'images/3.png',
+  'images/4.png',
+  'images/5.png',
+  'images/6.png',
+  'images/7.png'
+];
 
 let dbPromise = null;
 
@@ -39,19 +50,43 @@ export function initDB() {
 }
 
 /**
- * Fetch all pages sorted by pageNumber
+ * Fetch all pages sorted by pageNumber.
+ * Pre-populates default sequential images (1.png to 7.png) if store is empty.
  */
 export async function getAllPages() {
   const db = await initDB();
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readonly');
+    const transaction = db.transaction(STORE_NAME, 'readwrite');
     const store = transaction.objectStore(STORE_NAME);
     const request = store.getAll();
 
-    request.onsuccess = () => {
-      const pages = request.result || [];
-      pages.sort((a, b) => a.pageNumber - b.pageNumber);
-      resolve(pages);
+    request.onsuccess = async () => {
+      let pages = request.result || [];
+      
+      // If store is completely empty, populate initial default sequential pages
+      if (pages.length === 0) {
+        for (let i = 0; i < INITIAL_DEFAULT_PAGES.length; i++) {
+          const newPage = {
+            pageNumber: i + 1,
+            imageData: INITIAL_DEFAULT_PAGES[i],
+            fileName: `${i + 1}.png`,
+            createdAt: new Date().toISOString()
+          };
+          store.add(newPage);
+        }
+        
+        // Fetch re-populated list
+        const updatedRequest = store.getAll();
+        updatedRequest.onsuccess = () => {
+          pages = updatedRequest.result || [];
+          pages.sort((a, b) => a.pageNumber - b.pageNumber);
+          resolve(pages);
+        };
+        updatedRequest.onerror = (e) => reject(e.target.error);
+      } else {
+        pages.sort((a, b) => a.pageNumber - b.pageNumber);
+        resolve(pages);
+      }
     };
 
     request.onerror = (event) => reject(event.target.error);
@@ -60,7 +95,7 @@ export async function getAllPages() {
 
 /**
  * Add a new page to the diary and wait for transaction completion
- * @param {string} imageData - Base64 Data URL of Canva image
+ * @param {string} imageData - Base64 Data URL or path of Canva image
  * @param {string} fileName - Original file name
  */
 export async function addPage(imageData, fileName = '') {
