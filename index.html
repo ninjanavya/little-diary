@@ -45,6 +45,12 @@
         <span class="lock-indicator" title="Lock diary">🔒</span>
       </div>
       <div class="diary-header-actions">
+        <button id="export-diary-btn" class="btn-secondary" title="Export all diary pages as a backup file">
+          <span>📥 Export</span>
+        </button>
+        <button id="import-diary-btn" class="btn-secondary" title="Import diary pages from a backup file">
+          <span>📤 Import</span>
+        </button>
         <button id="change-passcode-btn" class="btn-secondary" title="Change Secret Passcode">
           <span>🔑 PIN</span>
         </button>
@@ -67,8 +73,9 @@
       </div>
     </header>
 
-    <!-- Hidden File Input -->
+    <!-- Hidden File Inputs -->
     <input type="file" id="file-input" accept="image/png, image/jpeg, image/jpg, image/webp" multiple>
+    <input type="file" id="import-file-input" accept=".json, application/json">
 
     <!-- Main Paper Container -->
     <section class="paper-frame">
@@ -76,14 +83,19 @@
       <div id="empty-state" class="empty-state">
         <div class="empty-icon">📖</div>
         <h3 class="empty-title">Your Diary is Empty</h3>
-        <p class="empty-desc">Upload your finished Canva diary pages (PNG/JPG) to begin creating your digital diary.</p>
-        <button id="empty-add-btn" class="btn-primary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          <span>Add First Page</span>
-        </button>
+        <p class="empty-desc">Upload your finished Canva diary pages (PNG/JPG) or import an existing diary backup file.</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+          <button id="empty-add-btn" class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            <span>Add First Page</span>
+          </button>
+          <button id="empty-import-btn" class="btn-secondary">
+            <span>📤 Import Backup</span>
+          </button>
+        </div>
       </div>
 
       <!-- Canva Image Container -->

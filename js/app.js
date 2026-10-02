@@ -1,6 +1,6 @@
 /**
  * Main Application Logic for Our Little Diary
- * Wires together IndexedDB, DiaryViewer, file uploads, page management, modal dialogs, and Passcode Protection.
+ * Wires together IndexedDB, DiaryViewer, file uploads, page management, modal dialogs, Passcode Protection, and Export/Import.
  */
 
 import { getAllPages, addPage, deletePage, reorderPages } from './db.js';
@@ -33,7 +33,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Main UI Elements
   const addPageBtn = document.getElementById('add-page-btn');
   const emptyAddBtn = document.getElementById('empty-add-btn');
+  const emptyImportBtn = document.getElementById('empty-import-btn');
   const fileInput = document.getElementById('file-input');
+
+  // Export / Import Elements
+  const exportDiaryBtn = document.getElementById('export-diary-btn');
+  const importDiaryBtn = document.getElementById('import-diary-btn');
+  const importFileInput = document.getElementById('import-file-input');
   
   const viewerContainer = document.getElementById('viewer-container');
   const canvaImg = document.getElementById('canva-image');
@@ -143,6 +149,62 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     setStoredPasscode(newPin.trim());
     showToast('Passcode updated ✓');
+  });
+
+  // =========================================================================
+  // EXPORT & IMPORT DIARY BACKUP FILES
+  // =========================================================================
+  exportDiaryBtn.addEventListener('click', async () => {
+    const allPages = await getAllPages();
+    if (allPages.length === 0) {
+      alert('No pages to export yet! Upload some pages first.');
+      return;
+    }
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allPages));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `Our_Little_Diary_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    showToast('Diary file exported ✓');
+  });
+
+  const triggerImport = () => importFileInput.click();
+  importDiaryBtn.addEventListener('click', triggerImport);
+  if (emptyImportBtn) emptyImportBtn.addEventListener('click', triggerImport);
+
+  importFileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const importedPages = JSON.parse(evt.target.result);
+        if (!Array.isArray(importedPages)) {
+          alert('Invalid diary backup file format!');
+          return;
+        }
+        
+        let addedCount = 0;
+        for (const page of importedPages) {
+          if (page.imageData) {
+            await addPage(page.imageData, page.fileName || '');
+            addedCount++;
+          }
+        }
+        
+        pages = await getAllPages();
+        viewer.setPages(pages, 0);
+        showToast(`${addedCount} pages imported ✓`);
+        importFileInput.value = '';
+      } catch (err) {
+        console.error('Error importing file:', err);
+        alert('Error reading backup file: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
   });
 
   // =========================================================================
