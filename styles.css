@@ -1,0 +1,495 @@
+/* 
+  Our Little Diary - Aesthetic CSS
+  Theme: Warm cream, handwritten accents, subtle paper textures, minimal clutter
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --bg-color: #FAF7F2;
+  --bg-pattern-dot: #ECE6DC;
+  --paper-bg: #FFFFFF;
+  --text-main: #3D352E;
+  --text-muted: #8C827A;
+  --border-color: #E8E2D8;
+  --accent-color: #7B6858;
+  --accent-hover: #5C4D41;
+  --danger-color: #A8544F;
+  --danger-hover: #8C403B;
+  --shadow-soft: 0 4px 24px rgba(61, 53, 46, 0.06);
+  --shadow-paper: 0 10px 30px rgba(60, 48, 38, 0.08), 0 2px 6px rgba(0, 0, 0, 0.03);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --font-hand: 'Caveat', cursive;
+  --font-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  background-image: radial-gradient(var(--bg-pattern-dot) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--text-main);
+  font-family: var(--font-ui);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Screen Visibility utility */
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  flex-direction: column;
+  align-items: center;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* ==========================================================================
+   1. DIARY COVER SCREEN
+   ========================================================================== */
+.cover-card {
+  background: var(--paper-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 64px 40px;
+  text-align: center;
+  box-shadow: var(--shadow-paper);
+  width: 100%;
+  max-width: 520px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.cover-badge {
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  color: var(--accent-color);
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.cover-title {
+  font-family: var(--font-hand);
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+
+.cover-subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-bottom: 36px;
+  max-width: 320px;
+}
+
+.cover-divider {
+  width: 60px;
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 0 auto 36px;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--accent-color);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 28px;
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--paper-bg);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 9px 18px;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #F7F4EE;
+  border-color: #D6CEC2;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  background-color: transparent;
+  color: var(--danger-color);
+  border: 1px solid #F0D4D2;
+  border-radius: var(--radius-sm);
+  padding: 9px 16px;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #FDF5F5;
+  border-color: var(--danger-color);
+}
+
+.btn-danger:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   2. MAIN DIARY VIEWER SCREEN
+   ========================================================================== */
+.diary-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 0 4px;
+}
+
+.diary-title-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.diary-header-title {
+  font-family: var(--font-hand);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.diary-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Paper Container for Canva Page */
+.paper-frame {
+  background-color: var(--paper-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-paper);
+  padding: 16px;
+  width: 100%;
+  min-height: 520px;
+  max-height: 75vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.canva-image {
+  max-width: 100%;
+  max-height: calc(75vh - 32px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 4px;
+  display: block;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+  width: 100%;
+}
+
+.empty-icon {
+  font-size: 2.8rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.empty-title {
+  font-family: var(--font-hand);
+  font-size: 2.2rem;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.empty-desc {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  max-width: 360px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* Bottom Navigation Controls */
+.diary-controls {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 0 4px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.nav-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-counter {
+  font-family: var(--font-hand);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+  min-width: 110px;
+  text-align: center;
+}
+
+.management-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Hidden File Input */
+#file-input {
+  display: none;
+}
+
+/* ==========================================================================
+   3. REORDER & MANAGE MODAL
+   ========================================================================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(40, 35, 30, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-card {
+  background: var(--paper-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-paper);
+  width: 100%;
+  max-width: 680px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-family: var(--font-hand);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.modal-close:hover {
+  color: var(--text-main);
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.reorder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 16px;
+}
+
+.reorder-item {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.reorder-item.selected {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.reorder-thumb {
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+  background: #FFF;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.reorder-label {
+  font-family: var(--font-hand);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.reorder-actions {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  justify-content: center;
+}
+
+.reorder-btn {
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.reorder-btn:hover:not(:disabled) {
+  background: #F4EFE6;
+}
+
+.reorder-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   4. RESPONSIVE DESIGN ADJUSTMENTS
+   ========================================================================== */
+@media (max-width: 640px) {
+  body {
+    padding: 10px;
+  }
+
+  .cover-card {
+    padding: 40px 20px;
+    margin: 20px auto;
+  }
+
+  .cover-title {
+    font-size: 2.8rem;
+  }
+
+  .diary-header-title {
+    font-size: 1.8rem;
+  }
+
+  .paper-frame {
+    padding: 8px;
+    min-height: 380px;
+    max-height: 68vh;
+  }
+
+  .canva-image {
+    max-height: calc(68vh - 16px);
+  }
+
+  .diary-controls {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .nav-group {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .management-group {
+    width: 100%;
+    justify-content: center;
+  }
+}
