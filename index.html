@@ -9,7 +9,7 @@
 <body>
 
   <!-- ====================================================================
-       1. DIARY COVER SCREEN
+       1. DIARY COVER SCREEN (PASSWORD PROTECTED)
        ==================================================================== -->
   <main id="cover-screen" class="screen active">
     <div class="cover-card">
@@ -17,6 +17,14 @@
       <h1 class="cover-title">Our Little Diary</h1>
       <p class="cover-subtitle">A collection of moments, memories & us</p>
       <div class="cover-divider"></div>
+
+      <!-- Passcode Protection Input -->
+      <div class="passcode-section">
+        <label for="passcode-input" class="passcode-label">🔒 Enter Secret Passcode</label>
+        <input type="password" id="passcode-input" class="passcode-input" placeholder="••••" autocomplete="off" maxlength="20">
+        <div id="passcode-error" class="passcode-error"></div>
+      </div>
+
       <button id="open-diary-btn" class="btn-primary">
         <span>Open Diary</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -32,10 +40,14 @@
   <main id="diary-screen" class="screen">
     <!-- Header -->
     <header class="diary-header">
-      <div id="cover-link" class="diary-title-nav" title="Return to cover">
+      <div id="cover-link" class="diary-title-nav" title="Lock & Return to cover">
         <h2 class="diary-header-title">Our Little Diary</h2>
+        <span class="lock-indicator" title="Lock diary">🔒</span>
       </div>
       <div class="diary-header-actions">
+        <button id="change-passcode-btn" class="btn-secondary" title="Change Secret Passcode">
+          <span>🔑 PIN</span>
+        </button>
         <button id="manage-pages-btn" class="btn-secondary" title="View all pages & reorder">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="7"/>

@@ -1,18 +1,33 @@
 /**
  * Main Application Logic for Our Little Diary
- * Wires together IndexedDB, DiaryViewer, file uploads, page management, and modal dialogs.
+ * Wires together IndexedDB, DiaryViewer, file uploads, page management, modal dialogs, and Passcode Protection.
  */
 
 import { getAllPages, addPage, deletePage, reorderPages } from './db.js';
 import { DiaryViewer } from './viewer.js';
+
+const PASSCODE_KEY = 'diary_passcode';
+const DEFAULT_PASSCODE = '1234';
+
+function getStoredPasscode() {
+  return localStorage.getItem(PASSCODE_KEY) || DEFAULT_PASSCODE;
+}
+
+function setStoredPasscode(newPin) {
+  localStorage.setItem(PASSCODE_KEY, newPin);
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Screens
   const coverScreen = document.getElementById('cover-screen');
   const diaryScreen = document.getElementById('diary-screen');
   
-  // Cover Buttons
+  // Cover Elements & Passcode Protection
   const openDiaryBtn = document.getElementById('open-diary-btn');
+  const passcodeInput = document.getElementById('passcode-input');
+  const passcodeError = document.getElementById('passcode-error');
+  const passcodeSection = document.querySelector('.passcode-section');
+  const changePasscodeBtn = document.getElementById('change-passcode-btn');
   const coverLink = document.getElementById('cover-link');
 
   // Main UI Elements
@@ -56,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   viewer.setPages(pages);
 
   // =========================================================================
-  // SCREEN SWITCHING
+  // PASSCODE & SCREEN SWITCHING
   // =========================================================================
   function showScreen(screen) {
     coverScreen.classList.remove('active');
@@ -64,12 +79,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     screen.classList.add('active');
   }
 
-  openDiaryBtn.addEventListener('click', () => {
-    showScreen(diaryScreen);
+  function attemptUnlock() {
+    const enteredPin = passcodeInput.value.trim();
+    const currentPin = getStoredPasscode();
+
+    if (enteredPin === currentPin) {
+      passcodeError.textContent = '';
+      passcodeInput.value = '';
+      showScreen(diaryScreen);
+    } else {
+      passcodeError.textContent = 'Incorrect passcode. Try again.';
+      passcodeSection.classList.remove('shake');
+      void passcodeSection.offsetWidth; // Trigger reflow for re-animation
+      passcodeSection.classList.add('shake');
+      passcodeInput.select();
+    }
+  }
+
+  openDiaryBtn.addEventListener('click', attemptUnlock);
+
+  passcodeInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      attemptUnlock();
+    }
   });
 
+  // Lock & Return to Cover
   coverLink.addEventListener('click', () => {
+    passcodeInput.value = '';
+    passcodeError.textContent = '';
     showScreen(coverScreen);
+  });
+
+  // Change Passcode
+  changePasscodeBtn.addEventListener('click', () => {
+    const currentPin = getStoredPasscode();
+    const enteredOld = prompt('Enter your CURRENT Secret PIN:');
+
+    if (enteredOld === null) return; // User cancelled
+
+    if (enteredOld !== currentPin) {
+      alert('Incorrect current PIN!');
+      return;
+    }
+
+    const newPin = prompt('Enter your NEW Secret PIN (e.g. 1234 or a secret phrase):');
+    if (!newPin || newPin.trim() === '') {
+      alert('PIN cannot be empty!');
+      return;
+    }
+
+    setStoredPasscode(newPin.trim());
+    alert('✅ Passcode successfully updated!');
   });
 
   // =========================================================================
@@ -120,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   nextBtn.addEventListener('click', () => viewer.next());
 
   document.addEventListener('keydown', (e) => {
-    // Only process arrow keys if modal is not active
+    // Only process arrow keys if modal is not active and on diary screen
     if (manageModal.classList.contains('active')) return;
     if (!diaryScreen.classList.contains('active')) return;
 
