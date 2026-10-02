@@ -47,11 +47,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   const moveRightBtn = document.getElementById('move-right-btn');
   const deleteBtn = document.getElementById('delete-btn');
 
-  // Modal Elements
+  // Modal & Toast Elements
   const managePagesBtn = document.getElementById('manage-pages-btn');
   const manageModal = document.getElementById('manage-modal');
   const modalCloseBtn = document.getElementById('modal-close-btn');
   const reorderGrid = document.getElementById('reorder-grid');
+  const toastNotification = document.getElementById('toast-notification');
+
+  let toastTimer = null;
+  function showToast(message) {
+    if (!toastNotification) return;
+    toastNotification.textContent = message;
+    toastNotification.classList.add('active');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toastNotification.classList.remove('active');
+    }, 2500);
+  }
 
   // Initialize Viewer Component
   const viewer = new DiaryViewer({
@@ -123,18 +135,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const newPin = prompt('Enter your NEW Secret PIN (e.g. 1234 or a secret phrase):');
+    const newPin = prompt('Enter your NEW Secret PIN (e.g. 8080 or a secret phrase):');
     if (!newPin || newPin.trim() === '') {
       alert('PIN cannot be empty!');
       return;
     }
 
     setStoredPasscode(newPin.trim());
-    alert('✅ Passcode successfully updated!');
+    showToast('Passcode updated ✓');
   });
 
   // =========================================================================
-  // FILE UPLOAD HANDLING
+  // FILE UPLOAD HANDLING WITH GUARANTEED SAVING
   // =========================================================================
   const triggerUpload = () => fileInput.click();
   addPageBtn.addEventListener('click', triggerUpload);
@@ -145,6 +157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!files || files.length === 0) return;
 
     let firstNewIndex = viewer.pages.length;
+    let savedCount = 0;
 
     for (const file of files) {
       if (!file.type.startsWith('image/')) continue;
@@ -152,17 +165,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         const dataUrl = await readFileAsDataURL(file);
         await addPage(dataUrl, file.name);
+        savedCount++;
       } catch (err) {
-        console.error('Error uploading file:', err);
+        console.error('Error saving file:', err);
+        alert(`Failed to save ${file.name}: ${err.message || err}`);
       }
     }
 
     // Reset file input value
     fileInput.value = '';
 
-    // Reload pages and navigate to the newly added page
-    pages = await getAllPages();
-    viewer.setPages(pages, firstNewIndex);
+    if (savedCount > 0) {
+      // Reload pages from storage and navigate to newly added page
+      pages = await getAllPages();
+      viewer.setPages(pages, firstNewIndex);
+      showToast(savedCount === 1 ? 'Page saved securely ✓' : `${savedCount} pages saved securely ✓`);
+    }
   });
 
   function readFileAsDataURL(file) {
@@ -208,6 +226,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       const newTargetIndex = Math.min(currentIndex, Math.max(0, pages.length - 1));
       viewer.setPages(pages, newTargetIndex);
+      showToast('Page deleted ✓');
     }
   });
 
@@ -223,6 +242,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const newIdOrder = currentPages.map(p => p.id);
     pages = await reorderPages(newIdOrder);
     viewer.setPages(pages, currentIndex - 1);
+    showToast('Page order saved ✓');
   });
 
   moveRightBtn.addEventListener('click', async () => {
@@ -237,6 +257,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const newIdOrder = currentPages.map(p => p.id);
     pages = await reorderPages(newIdOrder);
     viewer.setPages(pages, currentIndex + 1);
+    showToast('Page order saved ✓');
   });
 
   // =========================================================================
@@ -299,6 +320,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         pages = await reorderPages(newIdOrder);
         viewer.setPages(pages, index - 1);
         renderModalGrid();
+        showToast('Page order saved ✓');
       });
 
       // Move Right button in modal
@@ -313,6 +335,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         pages = await reorderPages(newIdOrder);
         viewer.setPages(pages, index + 1);
         renderModalGrid();
+        showToast('Page order saved ✓');
       });
 
       // Delete button in modal
@@ -324,6 +347,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const newIndex = Math.min(index, Math.max(0, pages.length - 1));
           viewer.setPages(pages, newIndex);
           renderModalGrid();
+          showToast('Page deleted ✓');
         }
       });
 

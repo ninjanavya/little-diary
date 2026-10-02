@@ -30,7 +30,7 @@ export function initDB() {
       };
 
       request.onerror = (event) => {
-        console.error('IndexedDB error:', event.target.error);
+        console.error('IndexedDB init error:', event.target.error);
         reject(event.target.error);
       };
     });
@@ -59,7 +59,7 @@ export async function getAllPages() {
 }
 
 /**
- * Add a new page to the diary
+ * Add a new page to the diary and wait for transaction completion
  * @param {string} imageData - Base64 Data URL of Canva image
  * @param {string} fileName - Original file name
  */
@@ -82,10 +82,16 @@ export async function addPage(imageData, fileName = '') {
 
     request.onsuccess = (event) => {
       newPage.id = event.target.result;
+    };
+
+    transaction.oncomplete = () => {
       resolve(newPage);
     };
 
-    request.onerror = (event) => reject(event.target.error);
+    transaction.onerror = (event) => {
+      console.error('IndexedDB save page error:', event.target.error);
+      reject(event.target.error);
+    };
   });
 }
 
@@ -108,7 +114,8 @@ export async function deletePage(id) {
 
   // Fetch remaining pages and renumber sequentially
   const remainingPages = await getAllPages();
-  
+  if (remainingPages.length === 0) return [];
+
   const updateTransaction = db.transaction(STORE_NAME, 'readwrite');
   const store = updateTransaction.objectStore(STORE_NAME);
 
