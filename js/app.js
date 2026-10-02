@@ -7,7 +7,7 @@ import { getAllPages, addPage, deletePage, reorderPages } from './db.js';
 import { DiaryViewer } from './viewer.js';
 
 const PASSCODE_KEY = 'diary_passcode';
-const DEFAULT_PASSCODE = '1234';
+const DEFAULT_PASSCODE = '8080';
 
 function getStoredPasscode() {
   return localStorage.getItem(PASSCODE_KEY) || DEFAULT_PASSCODE;
